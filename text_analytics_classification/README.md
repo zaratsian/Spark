@@ -1,5 +1,4 @@
 <h3>Text Classification (using Naive Bayes)</h3>
-
 <p>
 <br><strong>Purpose:</strong>
 <br>Shows how to use unstructured text data, combined with structured data, to predict an outcome. In this example, I am using labeled data to build a model that predicts airline ratings, based on the customer review of that airline. The rating ranges from 0-10, where 10 is the best rating.
