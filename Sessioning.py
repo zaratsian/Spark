@@ -42,8 +42,7 @@ def cleanrecord(record):
     return out
 
 recordsDF = records.map(cleanrecord).toDF(("host","datetime","type","request","status_code","bytes"))
-
-recordsDF.show(10,False)
+#recordsDF.show(10,False)
 
 '''
 +--------------------+---------------------+----+-----------------------------------------------+-----------+-----+
@@ -74,7 +73,7 @@ recordsDF.show(10,False)
 
 wSpec = Window.partitionBy("host").orderBy("datetime")
 sessions1 = recordsDF.filter(recordsDF.bytes>=50000).withColumn("previous_time", lag(recordsDF.datetime, 1).over(wSpec) )
-sessions1.show(10,False)
+#sessions1.show(10,False)
 
 '''
 +--------------+---------------------+----+------------------------------------------------------+-----------+------+---------------------+
@@ -93,6 +92,13 @@ sessions1.show(10,False)
 +--------------+---------------------+----+------------------------------------------------------+-----------+------+---------------------+
 '''
 
+##################################################################################
+#
+#   Calculate time delta between sessions
+#   This metric can be used for time out purposes, inferring session length, etc.
+#
+##################################################################################
+
 def time_delta(x,y):
     try:
         #start = datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f')
@@ -102,14 +108,30 @@ def time_delta(x,y):
         delta = 0
     return delta
 
-# register as a UDF
+# Register as a UDF
 f = udf(time_delta, IntegerType())
 
-sessions1.withColumn('duration', f(sessions1.previous_time, sessions1.datetime)).show(10,False)
+sessions2 = sessions1.withColumn('duration', f(sessions1.previous_time, sessions1.datetime))
+#sessions2.show(10,False)
+
+'''
++--------------+---------------------+----+------------------------------------------------------+-----------+------+---------------------+--------+
+|host          |datetime             |type|request                                               |status_code|bytes |previous_time        |duration|
++--------------+---------------------+----+------------------------------------------------------+-----------+------+---------------------+--------+
+|128.158.26.109|1995-07-05 13:04:31.0|GET |/shuttle/missions/sts-71/images/KSC-95EC-0917.jpg     |200        |52491 |null                 |0       |
+|128.158.26.109|1995-07-05 13:36:34.0|GET |/shuttle/missions/sts-71/images/KSC-95EC-0912.jpg     |200        |66202 |1995-07-05 13:04:31.0|1923    |
+|128.158.26.109|1995-07-05 13:51:24.0|GET |/shuttle/technology/sts-newsref/stsref-toc.html       |200        |84907 |1995-07-05 13:36:34.0|890     |
+|128.158.26.109|1995-07-05 13:52:45.0|GET |/shuttle/technology/sts-newsref/sts_asm.html          |200        |71656 |1995-07-05 13:51:24.0|81      |
+|128.158.26.109|1995-07-05 13:53:02.0|GET |/shuttle/technology/images/srb_mod_compare_3-small.gif|200        |55666 |1995-07-05 13:52:45.0|17      |
+|128.158.26.109|1995-07-05 14:37:37.0|GET |/shuttle/technology/images/srb_mod_compare_3.jpg      |200        |258334|1995-07-05 13:53:02.0|2675    |
+|128.158.44.230|1995-07-06 11:54:06.0|GET |/shuttle/technology/sts-newsref/spacelab.html         |200        |104916|null                 |0       |
+|128.158.44.230|1995-07-10 14:56:37.0|GET |/shuttle/technology/sts-newsref/spacelab.html         |200        |104916|1995-07-06 11:54:06.0|356551  |
+|128.158.44.230|1995-07-17 12:06:20.0|GET |/shuttle/technology/sts-newsref/spacelab.html         |200        |104914|1995-07-10 14:56:37.0|594583  |
+|128.158.44.230|1995-07-20 14:55:02.0|GET |/shuttle/technology/sts-newsref/stsref-toc.html       |200        |84905 |1995-07-17 12:06:20.0|269322  |
++--------------+---------------------+----+------------------------------------------------------+-----------+------+---------------------+--------+
+'''
 
 
-sessions2 = sessions1.withColumn("elapsedtime", sessions1.datetime - sessions1.previous_time)
-recordsDF.filter(recordsDF.bytes>=50000).withColumn( "rank", rank().over(wSpec) ).show(10,False)
 
 
 #ZEND
