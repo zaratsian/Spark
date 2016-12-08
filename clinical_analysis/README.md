@@ -4,7 +4,11 @@ This project contains publically available clinical trials data and code used fo
 <br>The purpose of this project is to provide an example of how to analyze both structured and unstructured data using Spark. This involves parsing and cleansing the raw data, text analytics (to find data-driven topics), and visualization techniques available within Zeppelin.
 <br>
 <br><img src="screenshots/screenshot1.png" class="inline"/>
+<br>
+<br>
 <br><img src="screenshots/screenshot2.png" class="inline"/>
+<br>
+<br>
 <br><img src="screenshots/screenshot3.png" class="inline"/>
 <br>
 <br><b>References:</b>
