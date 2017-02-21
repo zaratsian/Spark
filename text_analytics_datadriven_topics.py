@@ -22,9 +22,10 @@ import re
 #
 ################################################################################################
 
-rawdata = spark.read.load("/airlines.csv", format="csv", header=True)
+rawdata = spark.read.load("hdfs://sandbox.hortonworks.com:8020/tmp/airlines.csv", format="csv", header=True)
 rawdata = rawdata.fillna({'review': ''})                               # Replace nulls with blank string
 rawdata = rawdata.withColumn("uid", monotonically_increasing_id())     # Create Unique ID
+rawdata = rawdata.withColumn("year_month", rawdata.date.substr(1,7))   # Generate YYYY-MM variable
 
 # Show rawdata (as DataFrame)
 rawdata.show(10)
@@ -155,7 +156,7 @@ def breakout_array(index_number, record):
 udf_breakout_array = udf(breakout_array, FloatType())
 enrichedData = ldaResults                                                                   \
         .withColumn("Topic_12", udf_breakout_array(lit(12), ldaResults.topicDistribution))  \
-        .withColumn("topic_20", udf_breakout_array(lit(2), ldaResults.topicDistribution))            
+        .withColumn("topic_20", udf_breakout_array(lit(20), ldaResults.topicDistribution))            
 
 enrichedData.show()
 
