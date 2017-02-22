@@ -87,4 +87,26 @@ spark.sql('''
     ''').show(15,False)
 
 
+
+###############################################################################################################
+#
+#   Spark - Execute Job Against Hive Table
+#
+###############################################################################################################
+
+
+from pyspark.sql import HiveContext
+
+hive_context = HiveContext(sc)
+
+hive_context.sql('show tables').show(25,False)
+
+sample = hive_context.table("default.sample_07")
+sample.show(10,False)
+
+sample.registerTempTable("sample_temp")
+hive_context.sql('show tables').show(25,False)
+hive_context.sql("select * from sample_temp").show()
+
+
 #ZEND
