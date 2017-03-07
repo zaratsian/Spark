@@ -11,4 +11,5 @@
 <br><a href="https://spark.apache.org/docs/latest/tuning.html">Spark Tuning Guide</a>
 <br><a href="https://databricks.com/blog/2015/05/28/tuning-java-garbage-collection-for-spark-applications.html">Spark Tuning - Garbage Collection</a>
 <br><a href="http://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.5.3/bk_spark-component-guide/content/ch_introduction-spark.html">Hortonworks - Spark Reference</a>
+<br><a href="https://www.continuum.io/blog/developer-blog/self-service-open-data-science-custom-anaconda-management-packs-hortonworks-hdp">Anaconda Hortonworks Management Packs</a>
 <br>
