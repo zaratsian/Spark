@@ -1,5 +1,5 @@
-<h3><a href="http://spark.apache.org/">Apache Spark</a> (<a href="http://spark.apache.org/docs/latest/api/python/index.html">PySpark</a>) Scripts and References</h3>
-<br>This repo contains Spark code, written in python (using the <a href="http://spark.apache.org/docs/latest/api/python/index.html">PySpark API</a>). Feel free to copy and use as-in. Let me know if you have any questions or feedback regarding any of the code.
+<h3><a href="http://spark.apache.org/">Apache Spark</a> Scripts and References</h3>
+<br>This repo contains Spark code, written mostly in python (using the <a href="http://spark.apache.org/docs/latest/api/python/index.html">PySpark API</a>). I have also included code/scripts in Scala and SparkR. Feel free to copy and use as-in. Let me know if you have any questions or feedback regarding any of the code.
 <br>
 <br>Zeppelin Notebook Hub (can be used to view Zeppelin notebooks, in json format): https://www.zeppelinhub.com/viewer/
 <br>
