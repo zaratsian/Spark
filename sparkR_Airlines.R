@@ -34,6 +34,14 @@ head(rawdata)
 schema(rawdata)
 count(rawdata)
 
+#     id         airline       date location rating    cabin value recommended
+#1 10001 Delta Air Lines 2015-06-21 Thailand      7  Economy     4         YES
+#2 10002 Delta Air Lines 2015-06-19      USA      0  Economy     2          NO
+#3 10003 Delta Air Lines 2015-06-18      USA      0  Economy     1          NO
+#4 10004 Delta Air Lines 2015-06-17      USA      9 Business     4         YES
+#5 10005 Delta Air Lines 2015-06-17  Ecuador      7  Economy     3         YES
+#6 10006 Delta Air Lines 2015-06-17      USA      9 Business     5         YES
+
 
 # Derive Year, Month, and Day from the date variable.
 transformed <- selectExpr(rawdata, 
@@ -166,6 +174,15 @@ accuracy1 <- selectExpr(
 
 showDF(accuracy1)
 
+#+-----------+----------+-----------------+--------+
+#|recommended|prediction|number_of_reviews|accurate|
+#+-----------+----------+-----------------+--------+
+#|         NO|       YES|               27|       0|
+#|        YES|       YES|               49|       1|
+#|         NO|        NO|              110|       1|
+#|        YES|        NO|               26|       0|
+#+-----------+----------+-----------------+--------+
+
 accuracy2 <- summarize(groupBy(accuracy1, accuracy1$accurate), count = sum(accuracy1$number_of_reviews))
 
 showDF(accuracy2)
@@ -178,6 +195,8 @@ head(sql("
         (SELECT IF(recommended==prediction, 1, 0) as accuracy FROM nbPredictions_sql)
     "))
 
+# Accuracy_Score
+#           0.75
 
 
 #ZEND
