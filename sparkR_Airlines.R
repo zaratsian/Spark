@@ -214,6 +214,7 @@ head(sql("
 ###########################################################################################
 #
 #   Modeling (GLM)
+#   (1) Gaussian & (2) Binomial Predictions
 #
 ###########################################################################################
 
@@ -236,6 +237,26 @@ summary(gaussianGLM)
 gaussianPredictions <- predict(gaussianGLM, testingDF)
 showDF(gaussianPredictions)
 
+#+-----+----------+---------------+-----------+------+-----------+-----+-----------+----+-----+---+-----+------------------+
+#|   id|      date|        airline|   location|rating|      cabin|value|recommended|year|month|day|label|        prediction|
+#+-----+----------+---------------+-----------+------+-----------+-----+-----------+----+-----+---+-----+------------------+
+#|10005|2015-06-17|Delta Air Lines|    Ecuador|     7|    Economy|    3|        YES|2015|    6| 17|  7.0| 4.543003058474369|
+#|10008|2015-06-14|Delta Air Lines|        USA|     0|    Economy|    1|         NO|2015|    6| 14|  0.0| 1.548625588686491|
+#|10009|2015-06-13|Delta Air Lines|        USA|     4|   Business|    2|         NO|2015|    6| 13|  4.0| 5.146936019287523|
+#|10016|2015-06-05|Delta Air Lines|        USA|     0|    Economy|    1|         NO|2015|    6|  5|  0.0| 1.548625588686491|
+#|10017|2015-06-03|Delta Air Lines|     Canada|     9|    Economy|    4|        YES|2015|    6|  3|  9.0| 6.040191793368194|
+#|10018|2015-06-02|Delta Air Lines|        USA|     9|    Economy|    5|        YES|2015|    6|  2|  9.0|  7.53738052826202|
+#|10036|2015-05-05|Delta Air Lines|        USA|     5|    Economy|    3|         NO|2015|    5|  5|  5.0|4.5656995657975585|
+#|10077|2015-03-12|Delta Air Lines|        USA|     5|    Economy|    3|         NO|2015|    3| 12|  5.0|  4.61109258044371|
+#|10080|2015-03-03|Delta Air Lines|        USA|     0|First Class|    1|         NO|2015|    3|  3|  0.0| 2.878129135126983|
+#|10081|2015-03-03|Delta Air Lines|    Germany|    10|   Business|    4|        YES|2015|    3|  3| 10.0| 8.209403011044742|
+#|10089|2015-02-18|Delta Air Lines|        USA|     2|    Economy|    2|         NO|2015|    2| 18|  2.0|3.1366003528726196|
+#|10094|2015-02-10|Delta Air Lines|    Ireland|     7|    Economy|    3|        YES|2015|    2| 10|  7.0| 4.633789087766672|
+#|10102|2015-01-20|Delta Air Lines|        USA|     0|    Economy|    1|         NO|2015|    1| 20|  0.0|1.6621081253019838|
+#+-----+----------+---------------+-----------+------+-----------+-----+-----------+----+-----+---+-----+------------------+
+
+
+
 # Fit a generalized linear model of family "binomial" with spark.glm
 binomialGLM <- spark.glm(trainingDF, recommended ~ airline + cabin + year + month + value, family = "binomial")
 
@@ -246,6 +267,24 @@ summary(binomialGLM)
 binomialPredictions <- predict(binomialGLM, testingDF)
 showDF(binomialPredictions)
 
+#+-----+----------+---------------+-----------+------+-----------+-----+-----------+----+-----+---+-----+-------------------+
+#|   id|      date|        airline|   location|rating|      cabin|value|recommended|year|month|day|label|         prediction|
+#+-----+----------+---------------+-----------+------+-----------+-----+-----------+----+-----+---+-----+-------------------+
+#|10005|2015-06-17|Delta Air Lines|    Ecuador|     7|    Economy|    3|        YES|2015|    6| 17|  1.0| 0.5647025067536203|
+#|10008|2015-06-14|Delta Air Lines|        USA|     0|    Economy|    1|         NO|2015|    6| 14|  0.0|0.16484310555455592|
+#|10009|2015-06-13|Delta Air Lines|        USA|     4|   Business|    2|         NO|2015|    6| 13|  0.0| 0.5491552805132383|
+#|10016|2015-06-05|Delta Air Lines|        USA|     0|    Economy|    1|         NO|2015|    6|  5|  0.0|0.16484310555455592|
+#|10017|2015-06-03|Delta Air Lines|     Canada|     9|    Economy|    4|        YES|2015|    6|  3|  1.0| 0.7688300479888639|
+#|10018|2015-06-02|Delta Air Lines|        USA|     9|    Economy|    5|        YES|2015|    6|  2|  1.0| 0.8950282664177464|
+#|10036|2015-05-05|Delta Air Lines|        USA|     5|    Economy|    3|         NO|2015|    5|  5|  0.0|  0.545022785906816|
+#|10041|2015-05-04|Delta Air Lines|Switzerland|    10|    Economy|    5|        YES|2015|    5|  4|  1.0| 0.8873021365295578|
+#|10043|2015-05-04|Delta Air Lines|        USA|     1|    Economy|    1|         NO|2015|    5|  4|  0.0| 0.1541632118831403|
+#|10080|2015-03-03|Delta Air Lines|        USA|     0|First Class|    1|         NO|2015|    3|  3|  0.0| 0.1975240148562852|
+#|10081|2015-03-03|Delta Air Lines|    Germany|    10|   Business|    4|        YES|2015|    3|  3|  1.0|  0.863077070741532|
+#|10089|2015-02-18|Delta Air Lines|        USA|     2|    Economy|    2|         NO|2015|    2| 18|  0.0| 0.2689543087086207|
+#|10094|2015-02-10|Delta Air Lines|    Ireland|     7|    Economy|    3|        YES|2015|    2| 10|  1.0|0.48538240625978296|
+#|10102|2015-01-20|Delta Air Lines|        USA|     0|    Economy|    1|         NO|2015|    1| 20|  0.0| 0.1170082958954653|
+#+-----+----------+---------------+-----------+------+-----------+-----+-----------+----+-----+---+-----+-------------------+
 
 
 
@@ -293,6 +332,8 @@ showDF(fitted(kmeansModel))
 # Make predictions on holdout/test data
 kmeansPredictions <- predict(kmeansModel, testingDF)
 showDF(kmeansPredictions)
+
+
 
 
 
