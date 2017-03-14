@@ -199,4 +199,16 @@ head(sql("
 #           0.75
 
 
+
+#############################
+# Save and Load Model
+#############################
+#modelPath <- tempfile(pattern = "/tmp/ml", fileext = ".tmp")
+#write.ml(nbmodel, modelPath)
+#nbmodel2 <- read.ml(modelPath)
+#unlink(modelPath)
+
+
+
+
 #ZEND
