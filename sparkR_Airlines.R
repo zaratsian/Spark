@@ -210,5 +210,50 @@ head(sql("
 
 
 
+###########################################################################################
+#
+#   Modeling (KMeans Clustering) - Unsupervised
+#
+###########################################################################################
+
+kmeansdata <- selectExpr(rawdata, 
+                            "id",
+                            "date",
+                            "airline",
+                            "location",
+                            "cast(rating as int) as rating",
+                            "cabin",
+                            "cast(value as int) as value",
+                            "recommended",
+                            "cast(substr(date, 1, 4) as int) as year",
+                            "cast(substr(date, 6, 2) as int) as month",
+                            "cast(substr(date, 9, 2) as int) as day"
+                            )
+
+showDF(kmeansdata)
+schema(kmeansdata)
+
+# Split into Training and Testing DFs
+df_training_testing <- randomSplit(kmeansdata, weights=c(0.8, 0.2), seed=12345)
+
+trainingDF <- df_training_testing[[1]]
+testingDF  <- df_training_testing[[2]]
+
+count(trainingDF)
+count(testingDF)
+
+kmeansModel <- spark.kmeans(trainingDF, ~ rating + value + year + month + day,
+                            k = 5)
+
+# Model summary
+summary(kmeansModel)
+
+# Get fitted result from the k-means model
+showDF(fitted(kmeansModel))
+
+# Make predictions on holdout/test data
+kmeansPredictions <- predict(kmeansModel, testingDF)
+showDF(kmeansPredictions)
+
 
 #ZEND
