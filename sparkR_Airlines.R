@@ -204,9 +204,48 @@ head(sql("
 # Save and Load Model
 #############################
 #modelPath <- tempfile(pattern = "/tmp/ml", fileext = ".tmp")
-#write.ml(nbmodel, modelPath)
+#write.ml(nbmodel, modelPath)   
 #nbmodel2 <- read.ml(modelPath)
 #unlink(modelPath)
+
+
+
+
+###########################################################################################
+#
+#   Modeling (GLM)
+#
+###########################################################################################
+
+# Family may include (https://stat.ethz.ch/R-manual/R-devel/library/stats/html/family.html): 
+#    binomial(link = "logit")
+#    gaussian(link = "identity")
+#    Gamma(link = "inverse")
+#    inverse.gaussian(link = "1/mu^2")
+#    poisson(link = "log")
+#    quasi(link = "identity", variance = "constant")
+#    quasibinomial(link = "logit")
+#    quasipoisson(link = "log")
+
+gaussianGLM <- spark.glm(trainingDF, rating ~ airline + cabin + year + month + value, family = "gaussian")
+
+# Model summary
+summary(gaussianGLM)
+
+# Prediction
+gaussianPredictions <- predict(gaussianGLM, testingDF)
+showDF(gaussianPredictions)
+
+# Fit a generalized linear model of family "binomial" with spark.glm
+binomialGLM <- spark.glm(trainingDF, recommended ~ airline + cabin + year + month + value, family = "binomial")
+
+# Model summary
+summary(binomialGLM)
+
+# Prediction
+binomialPredictions <- predict(binomialGLM, testingDF)
+showDF(binomialPredictions)
+
 
 
 
@@ -254,6 +293,8 @@ showDF(fitted(kmeansModel))
 # Make predictions on holdout/test data
 kmeansPredictions <- predict(kmeansModel, testingDF)
 showDF(kmeansPredictions)
+
+
 
 
 #ZEND
