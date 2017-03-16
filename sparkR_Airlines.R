@@ -3,8 +3,13 @@
 #
 #   SparkR Code
 #
-#   Tested on Spark 2.0.0
+#   Tested on Hortonworks HDP 2.5
+#   Spark 2.0.0
 #   http://spark.apache.org/docs/2.0.0/sparkr.html
+#
+#   In Zeppelin, make sure to start Livy Server (start up on port 8998)
+#   su - livy
+#   /usr/hdp/current/livy-client/bin/livy-server start
 #
 ###########################################################################################
 
@@ -30,7 +35,7 @@ count(rawdata)
 # Keep only certain records (drop the column which contains airline reviews, "review")
 rawdata$review <- NULL
 
-head(rawdata)
+showDF(rawdata)
 schema(rawdata)
 count(rawdata)
 
@@ -66,6 +71,9 @@ schema(transformed)
 head(filter(transformed, transformed$airline == "Delta Air Lines" & transformed$location == "USA"))
 
 
+showDF(transformed)
+
+
 ###########################################################################################
 #
 #   Aggregations
@@ -73,27 +81,27 @@ head(filter(transformed, transformed$airline == "Delta Air Lines" & transformed$
 ###########################################################################################
 
 # Number of reviews by Airline
-head(summarize(groupBy(transformed, transformed$airline), number_of_reviews = count(transformed$airline)))
+showDF(summarize(groupBy(transformed, transformed$airline), number_of_reviews = count(transformed$airline)))
 
 
 # Average Rating by Airline:
-head(summarize(groupBy(transformed, transformed$airline), average_rating = mean(transformed$rating)))
+showDF(summarize(groupBy(transformed, transformed$airline), number_of_reviews = count(transformed$airline), average_rating = mean(transformed$rating)))
 
 
 # Average Rating by Airline and Cabin Type:
-head(summarize(groupBy(transformed, transformed$airline, transformed$cabin), average_rating = mean(transformed$rating)))
+showDF(summarize(groupBy(transformed, transformed$airline, transformed$cabin), average_rating = mean(transformed$rating)))
 
 
 # Number of Categories by "Airline"
-head(summarize(groupBy(transformed, transformed$airline), number_of_reviews = count(transformed$id)))
+showDF(summarize(groupBy(transformed, transformed$airline), number_of_reviews = count(transformed$id)))
 
 
 # Number of Categories by "Location"
-head(summarize(groupBy(transformed, transformed$location), number_of_reviews = count(transformed$id)))
+showDF(summarize(groupBy(transformed, transformed$location), number_of_reviews = count(transformed$id)))
 
 
 # Number of Categories by "Cabin"
-head(summarize(groupBy(transformed, transformed$cabin), number_of_reviews = count(transformed$id)))
+showDF(summarize(groupBy(transformed, transformed$cabin), number_of_reviews = count(transformed$id)))
 
 
 
@@ -106,7 +114,7 @@ head(summarize(groupBy(transformed, transformed$cabin), number_of_reviews = coun
 createOrReplaceTempView(transformed, "transformed_sql")
 
 # Calculate the Average Rating by Airline, order by descending avg_rating
-head(sql("
+showDF(sql("
     SELECT airline, count(*) as number_of_reviews, mean(rating) as avg_rating 
     FROM transformed_sql 
     group by airline 
@@ -151,7 +159,7 @@ testingDF  <- df_training_testing[[2]]
 count(trainingDF)
 count(testingDF)
 
-head(trainingDF)
+showDF(trainingDF)
 
 nbmodel <- spark.naiveBayes(trainingDF, recommended ~ airline + cabin + year + month + value )
 
@@ -189,7 +197,7 @@ showDF(accuracy2)
 
 # Calculate Accuracy Score
 createOrReplaceTempView(nbPredictions, "nbPredictions_sql")
-head(sql("
+showDF(sql("
     select (sum(*) / count(*)) as Accuracy_Score 
     from 
         (SELECT IF(recommended==prediction, 1, 0) as accuracy FROM nbPredictions_sql)
@@ -332,8 +340,6 @@ showDF(fitted(kmeansModel))
 # Make predictions on holdout/test data
 kmeansPredictions <- predict(kmeansModel, testingDF)
 showDF(kmeansPredictions)
-
-
 
 
 
