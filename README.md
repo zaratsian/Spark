@@ -1,4 +1,5 @@
-<img src="Apache_Spark_logo.png" class="inline"/>Tuning Tips and Tricks</h3>
+<img src="Apache_Spark_logo.png" class="inline"/><b>Tuning Tips and Tricks</b></h3>
+<br>
 <br>This repo contains a random collection of Spark code, written mostly in python (using the <a href="http://spark.apache.org/docs/latest/api/python/index.html">PySpark API</a>). I have also included code/scripts in Scala and SparkR. Feel free to copy and use as-in. Let me know if you have any questions or feedback regarding any of the code.
 <br>
 <br>Zeppelin Notebook Hub (can be used to view Zeppelin notebooks, in json format): https://www.zeppelinhub.com/viewer/
