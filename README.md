@@ -1,7 +1,10 @@
-<br><img src="spark.png" class="inline"/>Tuning Tips and Tricks</h3>
+<br><img src="Apache_Spark_logo.png" class="inline"/>Tuning Tips and Tricks</h3>
 <br>This repo contains a random collection of Spark code, written mostly in python (using the <a href="http://spark.apache.org/docs/latest/api/python/index.html">PySpark API</a>). I have also included code/scripts in Scala and SparkR. Feel free to copy and use as-in. Let me know if you have any questions or feedback regarding any of the code.
 <br>
 <br>Zeppelin Notebook Hub (can be used to view Zeppelin notebooks, in json format): https://www.zeppelinhub.com/viewer/
+<br>
+<br>Spark Tuning & Best Practices Reference: https://github.com/zaratsian/HDP_Tuning_Unofficial
+<br>Spark Tuning Tool: https://github.com/zaratsian/Spark/blob/master/spark_tuning_tool.py
 <br>
 <br><b>References:</b>
 <br>&nbsp&nbsp&nbsp&nbsp&bull;&nbsp<a href="http://spark.apache.org/docs/latest/quick-start.html">Apache Spark Quickstart</a>
