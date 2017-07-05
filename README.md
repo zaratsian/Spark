@@ -7,6 +7,11 @@
 <br>Spark Tuning & Best Practices Reference: https://github.com/zaratsian/HDP_Tuning_Unofficial
 <br>Spark Tuning Tool: https://github.com/zaratsian/Spark/blob/master/spark_tuning_tool.py
 <br>
+<br><b>Machine Learning Cheatsheets:</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://blogs.sas.com/content/subconsciousmusings/2017/04/12/machine-learning-algorithm-use/">SAS - ML Algorithms</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://scikit-learn.org/stable/tutorial/machine_learning_map/">SKLearn - Choosing the right estimator</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="https://docs.microsoft.com/en-in/azure/machine-learning/machine-learning-algorithm-cheat-sheet">MS Azure - ML Algorithms</a>
+<br>
 <br><b>References:</b>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://spark.apache.org/docs/latest/quick-start.html">Apache Spark Quickstart</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://spark.apache.org/docs/latest/api/python/index.html">Spark PySpark (Python) API</a>
