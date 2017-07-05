@@ -5,7 +5,7 @@
 #
 #   Dan Zaratsian
 #
-#   Usage: spark_tuning_tool.py --node_count=20 --node_cores=16 --node_ram=64 --executor_cores=5
+#   Usage: spark_tuning_tool.py --node_count=20 --node_cores=16 --node_ram=64
 #
 ##########################################################################################
 
