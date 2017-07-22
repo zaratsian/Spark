@@ -1,13 +1,16 @@
 
-##########################################################################################
+###################################################################################################
 #
-#   Spark Tuning Tool
-#
+#   Spark Tuning Tool (via Ambari)
 #   Dan Zaratsian
 #
-#   Usage: spark_tuning_tool_ambari.py --ambari_url=http://dzaratsian-hdp1:8080/api/v1/clusters/dz_hdp/services/HDFS/components/DATANODE --username=admin --password=admin
+#   This tool will extract cluster information from your cluster (via Ambari APIs), then the 
+#   code will use these extracted parameters in order to calculate the optimal Spark configuration.
 #
-##########################################################################################
+#   Usage: spark_tuning_tool_ambari.py --ambari_hostname=dzaratsian_hdp.field.hortonworks.com --ambari_port --ambari_cluster_name --username=admin --password=admin
+#
+# https://github.com/apache/ambari/blob/trunk/ambari-server/docs/api/v1/index.md#resources
+###################################################################################################
 
 
 import sys,re
@@ -18,39 +21,51 @@ import math
 
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'x', ['ambari_url=', 'username=', 'password='])
+    opts, args = getopt.getopt(sys.argv[1:], 'x', ['ambari_hostname=', 'ambari_port=', 'cluster_name=', 'username=', 'password='])
     
-    ambari_url = [opt[1] for opt in opts if opt[0]=='--ambari_url'][0]
-    username   = [opt[1] for opt in opts if opt[0]=='--username'][0]
-    password   = [opt[1] for opt in opts if opt[0]=='--password'][0]
+    ambari_hostname     = [opt[1] for opt in opts if opt[0]=='--ambari_hostname'][0]
+    ambari_port         = [opt[1] for opt in opts if opt[0]=='--ambari_port'][0]
+    cluster_name        = [opt[1] for opt in opts if opt[0]=='--ambari_cluster_name'][0]
+    username            = [opt[1] for opt in opts if opt[0]=='--username'][0]
+    password            = [opt[1] for opt in opts if opt[0]=='--password'][0]
 except:
-    print '\n\n[ USAGE ] spark_tuning_tool_ambari.py --ambari_url=<url> --username=<string> --password=<string>\n\n'
+    print '\n\n[ USAGE ] spark_tuning_tool_ambari.py --ambari_hostname=<hostname> --ambari_port=<port> --cluster_name=<cluster_name> --username=<string> --password=<string>\n\n'
     sys.exit(1)
 
 
-node_count = []
-node_cores = []
-node_ram   = []
 
-
-req1 = requests.get(ambari_url, auth=(username,password) )
-if req1.status_code == 200:
-    cluster_info = json.loads(req1.content)
+def get_datanode_parameters(ambari_hostname, ambari_port, cluster_name, username, password):
     
-    for host in cluster_info['host_components']:
-        print '[ INFO ] Collection data from ' + str(host['href'])
-        #req2 = requests.get('http://dzaratsian-hdp1:8080/api/v1/clusters/dz_hdp/hosts/dzaratsian-hdp2.field.hortonworks.com', auth=('admin','admin') )
-        #req2 = requests.get('http://dzaratsian-hdp1:8080/api/v1/clusters/dz_hdp/hosts/dzaratsian-hdp0.field.hortonworks.com/host_components/DATANODE'.replace('/host_components/DATANODE',''), auth=('admin','admin') )
-        req2 = requests.get(host['href'].replace('/host_components/DATANODE',''), auth=(username,password) )
-        host_info = json.loads(req2.content)
+    nodes_names = []
+    node_cores  = []
+    node_ram    = []  
+    
+    url = 'http://' + str(ambari_hostname) + ':' + str(ambari_port) + '/api/v1/clusters/' + str(cluster_name) + '/services/HDFS/components/DATANODE'
+    print '[ INFO ] Collection data from ' + str(url)
+    req = requests.get(url, auth=(username,password) )
+    
+    if req.status_code == 200:
+        cluster_info = json.loads(req.content)
         
-        node_cores.append(host_info['Hosts']['cpu_count'])
-        node_ram.append( int(math.floor(host_info['Hosts']['total_mem'] / float(1000*1000))) )
+        for host in cluster_info['host_components']:
+            url = host['href'].replace('/host_components/DATANODE','')
+            print '[ INFO ] Collection data from ' + str(url)
+            req2 = requests.get(url, auth=(username,password) )
+            host_info = json.loads(req2.content)
+            
+            nodes_names.append(host['HostRoles']['host_name'])
+            node_cores.append(host_info['Hosts']['cpu_count'])
+            node_ram.append( int(math.floor(host_info['Hosts']['total_mem'] / float(1000*1000))) )
+    
+    node_count = len(nodes_names)
+    node_cores = min(node_cores)
+    node_ram   = min(node_ram)
+    
+    return (node_count, node_cores, node_ram)
 
 
-node_count = len(cluster_info['host_components'])
-node_cores = min(node_cores)
-node_ram   = min(node_ram)
+node_count, node_cores, node_ram = get_datanode_parameters(ambari_hostname, ambari_port, cluster_name, username, password)
+
 
 if ((node_cores-1)/5) > 1:
     executor_cores = 5
@@ -66,8 +81,27 @@ total_cores = node_count * node_cores
 total_ram   = node_count * node_ram
 
 
-yarn_nodemanager_resource_memory_mb  = (node_ram - 2) * 1024
-yarn_nodemanager_resource_cpu_vcores = (node_cores - 1)      
+def get_yarn_parameters(ambari_hostname, ambari_port, cluster_name, username, password):
+    
+    url = 'http://' + str(ambari_hostname) + ':' + str(ambari_port) + '/api/v1/clusters/' + str(cluster_name) + '/configurations/service_config_versions?service_name=YARN&service_config_version=1'
+    print '[ INFO ] Collection data from ' + str(url)
+    req = requests.get(url, auth=(username,password))
+    
+    if req.status_code == 200:
+        cluster_info = json.loads(req.content)
+    
+    yarn_site = [config for config in cluster_info['items'][0]['configurations'] if config['type']=='yarn-site']
+    
+    yarn_nodemanager_resource_memory_mb   = int(yarn_site[0]['properties']['yarn.nodemanager.resource.memory-mb'])
+    #yarn_nodemanager_resource_memory_mb  = (node_ram - 2) * 1024
+    
+    yarn_nodemanager_resource_cpu_vcores  = int(yarn_site[0]['properties']['yarn.nodemanager.resource.cpu-vcores'])
+    #yarn_nodemanager_resource_cpu_vcores = (node_cores - 1)
+    
+    return (yarn_nodemanager_resource_memory_mb, yarn_nodemanager_resource_cpu_vcores)
+
+
+yarn_nodemanager_resource_memory_mb, yarn_nodemanager_resource_cpu_vcores = get_yarn_parameters(ambari_hostname, ambari_port, cluster_name, username, password)
 
 
 executor_cores     = executor_cores  # ~5 or less typically and ideally is a divisor of yarn.nodemanager.resource.cpu-vcores)
@@ -80,24 +114,29 @@ driver_memory      = executor_memory
 
 # Output Summary
 print '\n\n####################################################################\n' + \
-    '\nNode Count:         ' + str(node_count) + \
-    '\nNode Cores:         ' + str(node_cores) + \
-    '\nNode RAM:           ' + str(node_ram) + ' GB' \
+    '\nNode Count:                      ' + str(node_count) + \
+    '\nNode Cores:                      ' + str(node_cores) + \
+    '\nNode RAM:                        ' + str(node_ram) + ' GB' \
     '\n' + \
-    '\nTotal Cores:        ' + str(total_cores) + \
-    '\nTotal RAM:          ' + str(total_ram) + ' GB' \
+    '\nTotal Cores:                     ' + str(total_cores) + \
+    '\nTotal RAM:                       ' + str(total_ram) + ' GB' \
     '\n' + \
-    '\nexecutors_per_node: ' + str(executors_per_node) + \
+    '\nYARN Nodemanager RAM (mb):       ' + str(yarn_nodemanager_resource_memory_mb) + \
+    '\nYARN Nodemanager CPU Vcores:     ' + str(yarn_nodemanager_resource_cpu_vcores) + \
     '\n' + \
-    '\n--executor-cores:   ' + str(executor_cores) + \
-    '\n--executor-memory:  ' + str(executor_memory) + ' GB' \
-    '\n--num-executors:    ' + str(num_executors) + \
+    '\nexecutors_per_node:              ' + str(executors_per_node) + \
+    '\n' + \
+    '\n--executor-cores:                ' + str(executor_cores) + \
+    '\n--executor-memory:               ' + str(executor_memory) + ' GB' \
+    '\n--num-executors:                 ' + str(num_executors) + \
     '\n\n' + \
     './bin/spark-submit --master yarn --deploy-mode cluster' + ' --driver-cores ' + str(driver_cores) + ' --driver-memory ' + str(driver_memory) + 'G' + ' --executor-memory ' + str(executor_memory) + 'G' + ' --num-executors ' + str(num_executors) + ' --executor-cores ' + str(executor_cores) + \
+    '\n\n' + \
+    '/usr/hdp/current/spark2-client/bin/pyspark --master yarn --deploy-mode client' + ' --driver-cores ' + str(driver_cores) + ' --driver-memory ' + str(driver_memory) + 'G' + ' --executor-memory ' + str(executor_memory) + 'G' + ' --num-executors ' + str(num_executors) + ' --executor-cores ' + str(executor_cores) + \
     '\n\n####################################################################\n' 
 
 
-# To Do:
+
 # Add unused core count per node
 # Add unused memory per node
 
