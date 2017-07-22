@@ -34,7 +34,9 @@ try:
         yarn_nodemanager_resource_cpu_vcores = (node_cores - 2)
     
 except:
-    print '\n\n[ USAGE ] spark_tuning_tool.py --node_count=<number> --node_cores=<number> --node_ram=<number_in_GBs> --executor_cores=<5_or_less>\n\n'
+    print '\n'
+    print '\n[ USAGE ] spark_tuning_tool.py --node_count=<number> --node_cores=<number> --node_ram=<number_in_GBs>'
+    print '\n[ USAGE ] spark_tuning_tool.py --node_count=<number> --node_cores=<number> --node_ram=<number_in_GBs> [ --executor_cores=5 ] [ --yarn_memory=8192 ] [ --yarn_vcores=8 ]\n\n'
     sys.exit(1)
 
 
