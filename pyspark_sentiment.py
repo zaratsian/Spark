@@ -31,7 +31,7 @@ rawdata.show(50)
 '''
 rawdata_list =[
     (100, 1,  'this is the best product, i love it.'),
-    (101, 0,  'this has been a great experience the the product was not satisfactory.'),
+    (101, 0,  'this has been a great experience but the product was not satisfactory.'),
     (102, 1,  'the product is awesome.'),
     (103, -1, 'i hate the product and the price is terrible'),
     (104, 1,  'the product works great and it is awesome to use'),
