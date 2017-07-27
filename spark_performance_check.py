@@ -1,11 +1,24 @@
 
+####################################################################################################
+#
+#   Spark Performance Check
+#
+#   This script will simulate data, execute basic commands (counts(), show(), ect.) and collect 
+#   cluster setting and runtime stats that can be used for Spark tuninig and configuration.
+#
+#   Usage: ./bin/pyspark spark_performance_check.py
+#
+#   Output results will be written to /tmp/spark_performance_check.txt
+#
+####################################################################################################
+
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
 import datetime
 import requests
 import json
 
-output_file = open('/tmp/spark_perf_tuning.txt','wb')
+output_file = open('/tmp/spark_performance_check.txt','wb')
 
 start_time = datetime.datetime.now()
 start_time_total = start_time
