@@ -6,7 +6,7 @@
 #   This script will simulate data, execute basic commands (counts(), show(), ect.) and collect 
 #   cluster setting and runtime stats that can be used for Spark tuninig and configuration.
 #
-#   Usage: ./bin/spark-submit spark_performance_check.py
+#   Usage: ./bin/spark-submit spark_performance_check.py <number_of_records, default=50 million>
 #          This will also run from the pyspark shell
 #
 #   Output results will be written to /tmp/spark_performance_check.txt
@@ -20,6 +20,12 @@ from pyspark import SparkContext, SparkConf
 import datetime
 import requests
 import json
+import sys
+
+try:
+    number_of_records = int(sys.argv[1])
+except:
+    number_of_records = 50000000
 
 conf  = SparkConf().setAppName('Spark Performance Check').setMaster('yarn').set('deploy-mode','client')
 sc    = SparkContext(conf=conf)
@@ -33,8 +39,6 @@ output_file = open(file,'wb')
 
 start_time = datetime.datetime.now()
 start_time_total = start_time
-
-number_of_records = 50000000
 
 df = spark.range(0,number_of_records)
 
