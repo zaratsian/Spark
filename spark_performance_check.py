@@ -14,11 +14,21 @@
 
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
+from pyspark.sql import SparkSession
+from pyspark import SparkContext, SparkConf
 import datetime
 import requests
 import json
 
-output_file = open('/tmp/spark_performance_check.txt','wb')
+conf  = SparkConf().setAppName('Spark Performance Check').setMaster('yarn').set('deploy-mode','client')
+sc    = SparkContext(conf=conf)
+spark = SparkSession \
+    .builder \
+    .config(conf=conf) \
+    .getOrCreate()
+
+file = '/tmp/spark_performance_check.txt'
+output_file = open(file,'wb')
 
 start_time = datetime.datetime.now()
 start_time_total = start_time
@@ -90,6 +100,12 @@ sim = df.withColumn('date', udf_date() ) \
   .withColumn('metric1', udf_random() ) \
   .withColumn('rating', udf_rating() )
 
+print '\n\n' + '#'*100
+print '#'
+print '#    Spark Performance Check - Results'
+print '#'
+print '#'*100 + '\n\n'
+
 runtime_msg = '[ INFO ] Simulated ' + str(number_of_records) + ' records (' + str(len(sim.columns)) + ' columns) in ' + str((datetime.datetime.now() - start_time).seconds) + ' seconds\n'
 print runtime_msg
 output_file.write(runtime_msg)
@@ -159,5 +175,11 @@ output_file.write('[ INFO ] Estimated size (in bytes): ' + str(sc._jvm.org.apach
 output_file.write('\n[ INFO ] Total Runtime: ' + str((datetime.datetime.now() - start_time_total).seconds) + ' seconds\n')
 
 output_file.close()
+
+print '\n\n' + '#'*100
+print '#'
+print '#    Complete - Results can be found at ' + str(file)
+print '#'
+print '#'*100 + '\n\n'
 
 #ZEND
