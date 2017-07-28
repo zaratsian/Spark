@@ -6,7 +6,8 @@
 #   This script will simulate data, execute basic commands (counts(), show(), ect.) and collect 
 #   cluster setting and runtime stats that can be used for Spark tuninig and configuration.
 #
-#   Usage: ./bin/pyspark spark_performance_check.py
+#   Usage: ./bin/spark-submit spark_performance_check.py
+#          This will also run from the pyspark shell
 #
 #   Output results will be written to /tmp/spark_performance_check.txt
 #
@@ -149,30 +150,34 @@ output_file.write('\n')
 
 jobid = json.loads(req.content)[0]['jobId']
 
-import py4j.protocol  
-from py4j.protocol import Py4JJavaError  
-from py4j.java_gateway import JavaObject  
-from py4j.java_collections import JavaArray, JavaList
-
-from pyspark import RDD, SparkContext  
-from pyspark.serializers import PickleSerializer, AutoBatchedSerializer
-
-# Helper function to convert python object to Java objects
-def _to_java_object_rdd(rdd):  
-    """
-    Return a JavaRDD of Object by unpickling
-    It will convert each Python object into Java object by Pyrolite, whenever the
-    RDD is serialized in batch or not.
-    """
-    rdd = rdd._reserialize(AutoBatchedSerializer(PickleSerializer()))
-    return rdd.ctx._jvm.org.apache.spark.mllib.api.python.SerDe.pythonToJava(rdd._jrdd, True)
-
-JavaObj = _to_java_object_rdd(sim.rdd)
-
-# Now we can run the estimator
-output_file.write('[ INFO ] Estimated size (in bytes): ' + str(sc._jvm.org.apache.spark.util.SizeEstimator.estimate(JavaObj)))
-
-output_file.write('\n[ INFO ] Total Runtime: ' + str((datetime.datetime.now() - start_time_total).seconds) + ' seconds\n')
+# Try to get estimated memory of 'sim' dataframe
+try:
+    import py4j.protocol  
+    from py4j.protocol import Py4JJavaError  
+    from py4j.java_gateway import JavaObject  
+    from py4j.java_collections import JavaArray, JavaList
+    
+    from pyspark import RDD, SparkContext  
+    from pyspark.serializers import PickleSerializer, AutoBatchedSerializer
+    
+    # Helper function to convert python object to Java objects
+    def _to_java_object_rdd(rdd):  
+        """
+        Return a JavaRDD of Object by unpickling
+        It will convert each Python object into Java object by Pyrolite, whenever the
+        RDD is serialized in batch or not.
+        """
+        rdd = rdd._reserialize(AutoBatchedSerializer(PickleSerializer()))
+        return rdd.ctx._jvm.org.apache.spark.mllib.api.python.SerDe.pythonToJava(rdd._jrdd, True)
+    
+    JavaObj = _to_java_object_rdd(sim.rdd)
+    
+    # Now we can run the estimator
+    output_file.write('[ INFO ] Estimated size (in bytes): ' + str(sc._jvm.org.apache.spark.util.SizeEstimator.estimate(JavaObj)))
+    
+    output_file.write('\n[ INFO ] Total Runtime: ' + str((datetime.datetime.now() - start_time_total).seconds) + ' seconds\n')
+except:
+    pass
 
 output_file.close()
 
