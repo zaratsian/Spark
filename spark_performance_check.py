@@ -109,25 +109,25 @@ print '\n\n' + '#'*100
 print '#'
 print '#    Spark Performance Check - Results'
 print '#'
-print '#'*100 + '\n\n'
+print '#'*100
 
-runtime_msg = '[ INFO ] Simulated ' + str(number_of_records) + ' records (' + str(len(sim.columns)) + ' columns) in ' + str((datetime.datetime.now() - start_time).seconds) + ' seconds\n'
+runtime_msg = '\n[ INFO ] Simulated ' + str(number_of_records) + ' records (' + str(len(sim.columns)) + ' columns) in ' + str((datetime.datetime.now() - start_time).seconds) + ' seconds\n'
 print runtime_msg
 output_file.write(runtime_msg)
 
 #start_time = datetime.datetime.now()
 #sim.show()
-#runtime_msg = '[ INFO ] show() Runtime: ' + str((datetime.datetime.now() - start_time).seconds) + ' seconds\n'
+#runtime_msg = '\n[ INFO ] show() Runtime: ' + str((datetime.datetime.now() - start_time).seconds) + ' seconds\n'
 #print runtime_msg
 #output_file.write(runtime_msg)
 
 start_time = datetime.datetime.now()
 sim.count()
-runtime_msg = '[ INFO ] count() Runtime: ' + str((datetime.datetime.now() - start_time).seconds) + ' seconds\n'
+runtime_msg = '\n[ INFO ] count() Runtime: ' + str((datetime.datetime.now() - start_time).seconds) + ' seconds\n'
 print runtime_msg
 output_file.write(runtime_msg)
 
-output_file.write('\n\nSPARK METRICS:\n')
+output_file.write('\n[ INFO ] SPARK CONFIGS AND METRICS:\n\n')
 for metric in sc._conf.getAll():
     output_file.write(str(metric))
     output_file.write('\n')
@@ -135,18 +135,18 @@ for metric in sc._conf.getAll():
 req = requests.get('http://localhost:4040/api/v1/applications')
 
 appid = json.loads(req.content)[0]['id']
-output_file.write('[ INFO ] Spark App ID: ' + str(appid))
+output_file.write('\n[ INFO ] Spark App ID: ' + str(appid))
 output_file.write('\n')
 
 #req = requests.get('http://localhost:4040/api/v1/applications/' + str(appid) + '/environment')
 
-output_file.write('[ INFO ] Spark Executors:')
+output_file.write('\n[ INFO ] Spark Executors:')
 req = requests.get('http://localhost:4040/api/v1/applications/' + str(appid) + '/executors')
 runtime_msg = str(req.content)
 output_file.write(runtime_msg)
 output_file.write('\n')
 
-output_file.write('[ INFO ] Spark Jobs:')
+output_file.write('\n[ INFO ] Spark Jobs:')
 req = requests.get('http://localhost:4040/api/v1/applications/' + str(appid) + '/jobs')
 runtime_msg = str(req.content)
 output_file.write(runtime_msg)
@@ -177,17 +177,19 @@ try:
     JavaObj = _to_java_object_rdd(sim.rdd)
     
     # Now we can run the estimator
-    output_file.write('[ INFO ] Estimated size (in bytes): ' + str(sc._jvm.org.apache.spark.util.SizeEstimator.estimate(JavaObj)))
-    
-    output_file.write('\n[ INFO ] Total Runtime: ' + str((datetime.datetime.now() - start_time_total).seconds) + ' seconds\n')
+    output_file.write('\n[ INFO ] Estimated size (in bytes): ' + str(sc._jvm.org.apache.spark.util.SizeEstimator.estimate(JavaObj)))
 except:
     pass
+
+runtime_msg = 'Total Runtime: ' + str((datetime.datetime.now() - start_time_total).seconds) + ' seconds'
+output_file.write('\n\n[ INFO ] ' + runtime_msg + '\n')
 
 output_file.close()
 
 print '\n\n' + '#'*100
 print '#'
 print '#    Complete - Results can be found at ' + str(file)
+print '#    ' + str(runtime_msg)
 print '#'
 print '#'*100 + '\n\n'
 
