@@ -23,6 +23,9 @@ headers = {'Content-Type': 'application/json', 'X-Requested-By': 'spark'}
 def livy_get_sessions():
     req_sessions     = requests.get(url + '/sessions', headers=headers)
     sessions_payload = json.loads(req_sessions.content)
+    print '[ INFO ] Total Sessions: ' + str(sessions_payload['total'])
+    for session in sessions_payload['sessions']:
+        print '[ INFO ] Session ID ' + str(session['id']) + ', state: ' + str(session['state']) + ', appID: ' + str(session['appId'])
     return sessions_payload
 
 
