@@ -41,11 +41,13 @@ spark = SparkSession \
 
 start_time = datetime.datetime.now()
 
+# Load Data from Hive
 #movies  = spark.sql("SELECT * FROM movies")
 #ratings = spark.sql("SELECT * FROM ratings")
 #links   = spark.sql("SELECT * FROM links")
 #tags    = spark.sql("SELECT * FROM tags")
 
+# Load Data from HDFS (as CSV)
 movies  = spark.read.load("/ml-latest/movies.csv", "csv", delimiter=",", inferSchema=True, header=True)
 ratings = spark.read.load("/ml-latest/ratings.csv", "csv", delimiter=",", inferSchema=True, header=True)
 links   = spark.read.load("/ml-latest/links.csv", "csv", delimiter=",", inferSchema=True, header=True)
