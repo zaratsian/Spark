@@ -1,14 +1,14 @@
 
 #######################################################################################################################
 #
-#   Spark Analysis on the MovieLens Dataset (20 Million Movie Reviews)
+#   Spark Analysis on the MovieLens Dataset (26 Million Movie Reviews)
 #
 #   Download Movie Dataset from here: https://grouplens.org/datasets/movielens/
 #   Here's the direct link: http://files.grouplens.org/datasets/movielens/ml-latest.zip
 #
 #   Additional info and background can be found here as well: https://www.kaggle.com/grouplens/movielens-20m-dataset
 #
-#   Datasets contains 26 million reviews (Stored in Hive as ORC using https://github.com/zaratsian/Apache-Hive/blob/master/movielens.sql)
+#   Datasets contains 26 million reviews (Stored in HDFS as CSV and also in Hive as ORC using https://github.com/zaratsian/Apache-Hive/blob/master/movielens.sql)
 #       1.)  movies that contains movie information
 #       2.)  ratings that contains ratings of movies by users
 #       3.)  links that contains identifiers that can be used to link to other sources
