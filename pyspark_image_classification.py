@@ -24,12 +24,13 @@ pip install tensorflow
 #   https://mvnrepository.com/artifact/databricks/spark-deep-learning
 #   https://databricks.com/blog/2017/06/06/databricks-vision-simplify-large-scale-deep-learning.html
 #   https://medium.com/linagora-engineering/making-image-classification-simple-with-spark-deep-learning-f654a8b876b8 --driver-memory=5G --executor-memory=5G
+#   https://github.com/databricks/spark-deep-learning/issues/18
 #
 ############################################################################################################
 
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
-from pyspark.ml.classification import LogisticRegression, GBTClassifier
+from pyspark.ml.classification import LogisticRegression, GBTClassifier, RandomForestClassifier
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.ml import Pipeline
 from sparkdl import DeepImageFeaturizer
@@ -58,6 +59,7 @@ print '[ INFO ] Number of Training Records: ' + str(test_df.count())
 featurizer = DeepImageFeaturizer(inputCol="image", outputCol="features", modelName="InceptionV3")
 lr = LogisticRegression(maxIter=20, regParam=0.05, elasticNetParam=0.3, labelCol="label")
 gb = GBTClassifier(featuresCol="features", labelCol="label", predictionCol="prediction", maxDepth=5, maxBins=32, minInstancesPerNode=1, minInfoGain=0.0, maxMemoryInMB=256, cacheNodeIds=False, checkpointInterval=10, lossType="logistic", maxIter=5, stepSize=0.1, seed=None, subsamplingRate=1.0)
+rf = RandomForestClassifier(featuresCol="features", labelCol="label", predictionCol="prediction", probabilityCol="probability", rawPredictionCol="rawPrediction", maxDepth=5, maxBins=32, minInstancesPerNode=1, minInfoGain=0.0, maxMemoryInMB=256, cacheNodeIds=False, checkpointInterval=10, impurity="gini", numTrees=20, featureSubsetStrategy="auto", seed=12345)
 pipe = Pipeline(stages=[featurizer, gb])
 pipe_model = pipe.fit(train_df)
 
