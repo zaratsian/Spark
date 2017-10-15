@@ -8,6 +8,12 @@
 #
 #   Simple example to predict loan defaults (note: minimal data prep was done for this example)
 #   Lending Club Loan Dataset: https://www.kaggle.com/wendykan/lending-club-loan-data
+#   ./bin/pysparkling 
+#   ./bin/pyspark --py-files /sparkling-water-2.1.14/py/build/dist/h2o_pysparkling_2.1-2.1.14.zip
+#
+#   To get it to work in Zeppelin:
+#   Within ./conf/zeppelin-env.sh, add export SPARK_SUBMIT_OPTIONS="--files /sparkling-water-2.1.14/py/build/dist/h2o_pysparkling_2.1-2.1.14.zip"
+#   Within ./bin/interpreter.sh,   add .zip file to PYTHONPATH, such as editing this line: export PYTHONPATH="$SPARK_HOME/python/:/sparkling-water-2.1.14/py/build/dist/h2o_pysparkling_2.1-2.1.14.zip:$PYTHONPATH"
 #
 ###############################################################################################################
 
