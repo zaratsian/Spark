@@ -1,0 +1,245 @@
+
+
+export spk_driver_memory=8G
+export spk_executor_memory=8G
+
+
+/usr/hdp/current/spark2-client/bin/sparkR                   \
+    --master yarn                                           \
+    --deploy-mode client                                    \
+    --driver-memory $spk_driver_memory                      \
+    --executor-memory $spk_executor_memory                  \
+    --conf "spark.dynamicAllocation.enabled=true"           \
+    --conf "spark.shuffle.service.enabled=true"             \
+    --conf "spark.dynamicAllocation.initialExecutors=3"     \
+    --conf "spark.serializer=org.apache.spark.serializer.KryoSerializer"
+
+
+/usr/hdp/current/spark2-client/bin/pyspark                  \
+    --master yarn                                           \
+    --deploy-mode client                                    \
+    --driver-memory $spk_driver_memory                      \
+    --executor-memory $spk_executor_memory                  \
+    --conf "spark.dynamicAllocation.enabled=true"           \
+    --conf "spark.shuffle.service.enabled=true"             \
+    --conf "spark.dynamicAllocation.initialExecutors=3"     \
+    --conf "spark.serializer=org.apache.spark.serializer.KryoSerializer"
+
+
+##################################################################################################
+##################################################################################################
+#
+#   SparkR
+#
+##################################################################################################
+##################################################################################################
+
+/usr/hdp/current/spark2-client/bin/sparkR                   \
+    --master yarn                                           \
+    --deploy-mode client                                    \
+    --driver-memory 8G                                      \
+    --conf "spark.dynamicAllocation.enabled=true"           \
+    --conf "spark.shuffle.service.enabled=true"             \
+    --conf "spark.dynamicAllocation.initialExecutors=3"     \
+    --conf "spark.yarn.executor.memoryOverhead=8G"          \
+    --conf "spark.yarn.driver.memoryOverhead=8G"
+
+library(SparkR)
+library(lubridate)
+node_count <- 3
+node_cores <- 8
+
+test_file  <- '/tmp/test_data_10k.txt'
+#test_file  <- '/Users/dzaratsian/hortonworks/Accounts/Norfolk Southern/debugging/test_data_10k.txt'
+
+####################################################################
+#
+#   Section 1 - Load Data
+#
+####################################################################
+s <- now()  
+df <- read.df(test_file, "csv", header = "true", inferSchema = "true", na.strings = "NA")
+e <- now()
+tm <- capture.output(e - s)
+print(tm)
+#10k        [1] "Time difference of 20.62607 secs"
+
+
+# Cache DataFrame
+s <- now()
+df <- repartition(df, numPartitions=(node_cores/2)*node_count)
+count(df)
+e <- now()
+tm <- capture.output(e - s)
+print(tm)
+#10k        [1] "Time difference of 15.18242 secs"  
+
+
+####################################################################
+#
+#   Section 2 - UDF
+#
+####################################################################
+schema <- structType(structField('grp1', 'string'),
+                    structField('grp2', 'string'),
+                    structField('id', 'string'),
+                    structField('x', 'double'),
+                    structField('y', 'double'),
+                    structField('x2', 'double'))
+
+s <- now()
+df <- dapply(df, function(z){z <- cbind(z, z$x*2)}, schema)
+showDF(df)
+e <- now()
+tm <- capture.output(e - s)
+print(tm)
+#Cached         [1] "Time difference of 2.573329 mins"
+
+
+
+
+schema <- structType(structField('grp1', 'string'),
+                    structField('grp2', 'string'),
+                    structField('id', 'string'),
+                    structField('x', 'double'),
+                    structField('y', 'double'),
+                    structField('x2', 'double'))
+
+s <- now()
+df <- dapply(df, function(x) {
+    a <- SparkR:::callJMethod(df$x, "multiply", as.integer(0))
+    b <- SparkR:::callJMethod(2, "apply",    as.integer(1))
+    c(a, b)
+    }, schema)
+
+
+s <- now()
+showDF(df)
+e <- now()
+tm <- capture.output(e - s)
+
+
+####################################################################
+#
+#   Section 3 - KMeans (uncached)
+#
+####################################################################
+
+s <- now()
+kmeansModel <- spark.kmeans(df, ~ x + y, k = 5)
+e <- now()
+tm <- capture.output(e - s)
+ 
+
+
+
+    
+
+
+
+
+
+
+##################################################################################################
+##################################################################################################
+#
+#   PySpark
+#
+##################################################################################################
+##################################################################################################
+
+/usr/hdp/current/spark2-client/bin/pyspark                  \
+    --master yarn                                           \
+    --deploy-mode client                                    \
+    --driver-memory 8G                                      \
+    --executor-memory 8G                                    \
+    --conf "spark.dynamicAllocation.enabled=true"           \
+    --conf "spark.shuffle.service.enabled=true"             \
+    --conf "spark.dynamicAllocation.initialExecutors=3"     \
+    --conf "spark.yarn.executor.memoryOverhead=8G"          \
+    --conf "spark.yarn.driver.memoryOverhead=8G"
+
+import sys, re
+import datetime, time
+from pyspark.sql.types import *
+from pyspark.sql.functions import udf, col, lit, monotonically_increasing_id
+from pyspark.ml.classification import GBTClassifier
+from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+from pyspark.ml.clustering import KMeans
+from pyspark.ml.feature import VectorIndexer, VectorAssembler, StringIndexer
+from pyspark.ml import Pipeline, PipelineModel
+
+test_file = '/tmp/test_data_10k.txt'
+
+####################################################################
+#
+#   Section 1 - Load Data
+#
+####################################################################
+s = datetime.datetime.now()
+df = spark.read.load(test_file, format="csv", header=True, inferSchema=True)
+e = datetime.datetime.now()
+print "[ INFO ] Time difference of " + str((e-s).seconds/float(60)) + " mins"
+#SA    [ INFO ] Time difference of 0.15 mins
+#Kryo  [ INFO ] Time difference of 0.283333333333 mins
+#10k   [ INFO ] Time difference of 0.366666666667 mins
+#100k  [ INFO ] Time difference of 0.366666666667 mins
+
+
+# Cache DataFrame
+s = datetime.datetime.now()
+df.cache()
+df.count()
+# 67600000
+e = datetime.datetime.now()
+print "[ INFO ] Time difference of " + str((e-s).seconds/float(60)) + " mins"
+#10k   [ INFO ] Time difference of 0.333333333333 mins
+
+
+####################################################################
+#
+#   Section 2 - UDF
+#
+####################################################################
+
+s = datetime.datetime.now()
+
+def myudf(column):
+    return column * 2
+
+udf_myudf = udf(myudf, FloatType())
+
+df = df.withColumn('x2', udf_myudf('x') )
+df.show()
+
+e = datetime.datetime.now()
+print "[ INFO ] Time difference of " + str((e-s).seconds/float(60)) + " mins"
+#Cached     [ INFO ] Time difference of 0.0333333333333 mins
+#SA         [ INFO ] Time difference of 0.0833333333333 mins
+#Kryo       [ INFO ] Time difference of 0.15 mins
+#10k        [ INFO ] Time difference of 0.166666666667 mins
+#100k       [ INFO ] Time difference of 0.266666666667 mins
+
+####################################################################
+#
+#   Section 3 - KMeans
+#
+####################################################################
+
+s = datetime.datetime.now()
+features        = ['x','y']
+va              = VectorAssembler(inputCols=features, outputCol="features")
+kmeans          = KMeans(k=5, seed=12345)
+pipeline_stages = [va, kmeans]
+pipeline_run    = Pipeline(stages=pipeline_stages)
+model           = pipeline_run.fit(df)
+e = datetime.datetime.now()
+print "[ INFO ] Time difference of " + str((e-s).seconds/float(60)) + " mins"
+#Cached     
+#SA         [ INFO ] Time difference of 1.58333333333 mins
+#Kryo       [ INFO ] Time difference of 4.5 mins
+#10k        [ INFO ] Time difference of 4.51666666667 mins
+#100k  
+
+
+#ZEND
