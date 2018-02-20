@@ -8,8 +8,9 @@
 <br>Spark Tuning Tool: https://github.com/zaratsian/Spark/blob/master/spark_tuning_tool.py
 <br>
 <br><b>Machine Learning Cheatsheets:</b>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://blogs.sas.com/content/subconsciousmusings/2017/04/12/machine-learning-algorithm-use/">SAS - ML Algorithms</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://scikit-learn.org/stable/tutorial/machine_learning_map/">SKLearn - Choosing the right estimator</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="https://s3.amazonaws.com/assets.datacamp.com/blog_assets/Keras_Cheat_Sheet_Python.pdf">Keras Cheatsheet</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://blogs.sas.com/content/subconsciousmusings/2017/04/12/machine-learning-algorithm-use/">SAS - ML Algorithms</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="https://docs.microsoft.com/en-in/azure/machine-learning/machine-learning-algorithm-cheat-sheet">MS Azure - ML Algorithms</a>
 <br>
 <br><b>References:</b>
@@ -22,4 +23,5 @@
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.5.3/bk_spark-component-guide/content/ch_introduction-spark.html">Hortonworks - Spark Reference</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="https://www.continuum.io/blog/developer-blog/self-service-open-data-science-custom-anaconda-management-packs-hortonworks-hdp">Anaconda Hortonworks Management Packs</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="https://www.gitbook.com/book/umbertogriffo/apache-spark-best-practices-and-tuning/details">Apache Spark - Best Practices & Tuning</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://cdn.qubole.com/wp-content/uploads/2017/08/PySpark_SQL_Cheat_Sheet_Python.pdf">PySpark Cheatsheet</a>
 <br>
