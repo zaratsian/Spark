@@ -17,7 +17,7 @@ Usage:
     --master yarn \
     --deploy-mode client \
     --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.2.0 \
-    pyspark_structured_streaming_kafka.py
+    pyspark_structured_stream_kafka.py
 '''
 
 import os,sys
@@ -33,7 +33,7 @@ spark = SparkSession \
     .getOrCreate()
 
 events = spark \
-        .read \
+        .readStream \
         .format("kafka") \
         .option("kafka.bootstrap.servers", "dzaratsian2.field.hortonworks.com:6667") \
         .option("subscribe", "clickstream") \
@@ -42,24 +42,61 @@ events = spark \
 events = events.selectExpr("CAST(value AS STRING)")
 
 # Option #1: Parse by column, using withColumn
-parsed_events = events.withColumn('uid', split(events['value'],',')[0].cast(StringType()) )        \
-                    .withColumn('user', split(events['value'],',')[1].cast(StringType()) )         \
-                    .withColumn('datetime', split(events['value'],',')[2].cast(TimestampType()) )     \
-                    .withColumn('state', split(events['value'],',')[3].cast(StringType()) )        \
-                    .withColumn('duration', split(events['value'],',')[4].cast(FloatType()) )     \
-                    .withColumn('rate', split(events['value'],',')[5].cast(FloatType()) )         \
+parsed_events = events.withColumn('uid', split(events['value'],',')[0].cast(StringType()) )         \
+                    .withColumn('user', split(events['value'],',')[1].cast(StringType()) )          \
+                    .withColumn('datetime', split(events['value'],',')[2].cast(TimestampType()) )   \
+                    .withColumn('state', split(events['value'],',')[3].cast(StringType()) )         \
+                    .withColumn('duration', split(events['value'],',')[4].cast(FloatType()) )       \
+                    .withColumn('rate', split(events['value'],',')[5].cast(FloatType()) )           \
                     .withColumn('action', split(events['value'],',')[6].cast(StringType()) )
 
-parsed_events.show(10,False)
+#parsed_events.show(10,False)
+
+
+###################################################################################################
+# Displaying user count. 60 second window with 15 sec sliding duration...
+###################################################################################################
 
 # http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.functions.window
 # pyspark.sql.functions.window(timeColumn, windowDuration, slideDuration=None, startTime=None)
 windowedCounts = parsed_events.groupBy(
     window(parsed_events.datetime, "1 minutes", "15 seconds"),
     parsed_events.user) \
-    .count()
+    .count()            \
+    .sort(desc("count"))
 
-windowedCounts.sort(desc("count")).show(10,False)
+query1 = windowedCounts \
+    .writeStream \
+    .outputMode("complete") \
+    .format("console") \
+    .start()
+
+
+
+
+###################################################################################################
+# Displaying average duration by user. 60 second window with 15 sec sliding duration...
+###################################################################################################
+
+windowedAvg = parsed_events.groupBy(
+    window(parsed_events.datetime, "1 minutes", "15 seconds"),
+    parsed_events.user) \
+    .agg({'duration': 'mean'}) \
+    .sort(desc("avg(duration)"))
+
+query2 = windowedAvg \
+    .writeStream \
+    .outputMode("complete") \
+    .format("console") \
+    .start()
+
+
+
+
+query1.awaitTermination()
+query2.awaitTermination()
+
+
 
 
 '''
