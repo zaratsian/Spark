@@ -21,6 +21,15 @@ rawdata = spark.read.load('/tmp/nyc_taxi_data.csv', format="csv", header=True, i
 rawdata.show(10,False)
 
 
+# Parse Fixed Length file
+rawdata.select(
+    rawdata.value.substr(1,3).alias('id'),
+    rawdata.value.substr(4,8).alias('date'),
+    rawdata.value.substr(12,3).alias('string'),
+    rawdata.value.substr(15,4).cast('integer').alias('integer')
+).show(10,False)
+
+
 # How many unique cars are there (based on vehicle_id)
 rawdata.select('vehicle_id').distinct().count()
 
