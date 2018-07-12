@@ -12,6 +12,7 @@
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="https://s3.amazonaws.com/assets.datacamp.com/blog_assets/Keras_Cheat_Sheet_Python.pdf">Keras Cheatsheet</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://blogs.sas.com/content/subconsciousmusings/2017/04/12/machine-learning-algorithm-use/">SAS - ML Algorithms</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="https://docs.microsoft.com/en-in/azure/machine-learning/machine-learning-algorithm-cheat-sheet">MS Azure - ML Algorithms</a>
+<a href="https://www.kaggle.com/sudalairajkumar/winning-solutions-of-kaggle-competitions">Kaggle ML Solutions</a>
 <br>
 <br><b>References:</b>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<a href="http://spark.apache.org/docs/latest/quick-start.html">Apache Spark Quickstart</a>
