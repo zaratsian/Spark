@@ -34,9 +34,9 @@ try:
         yarn_nodemanager_resource_cpu_vcores = (node_cores - 2)
     
 except:
-    print '\n'
-    print '\n[ USAGE ] spark_tuning_tool.py --node_count=<number> --node_cores=<number> --node_ram=<number_in_GBs>'
-    print '\n[ USAGE ] spark_tuning_tool.py --node_count=<number> --node_cores=<number> --node_ram=<number_in_GBs> [ --executor_cores=5 ] [ --yarn_memory=8192 ] [ --yarn_vcores=8 ]\n\n'
+    print('\n')
+    print('\n[ USAGE ] spark_tuning_tool.py --node_count=<number> --node_cores=<number> --node_ram=<number_in_GBs>')
+    print('\n[ USAGE ] spark_tuning_tool.py --node_count=<number> --node_cores=<number> --node_ram=<number_in_GBs> [ --executor_cores=5 ] [ --yarn_memory=8192 ] [ --yarn_vcores=8 ]\n\n')
     sys.exit(1)
 
 
@@ -53,7 +53,7 @@ driver_memory      = executor_memory
 
 
 # Output Summary
-print '\n\n####################################################################\n' + \
+print('\n\n####################################################################\n' + \
     '\nNode Count:                      ' + str(node_count) + \
     '\nNode Cores:                      ' + str(node_cores) + \
     '\nNode RAM:                        ' + str(node_ram) + ' GB' \
@@ -73,7 +73,7 @@ print '\n\n####################################################################\
     './bin/spark-submit --master yarn --deploy-mode cluster' + ' --driver-cores ' + str(driver_cores) + ' --driver-memory ' + str(driver_memory) + 'G' + ' --executor-memory ' + str(executor_memory) + 'G' + ' --num-executors ' + str(num_executors) + ' --executor-cores ' + str(executor_cores) + \
     '\n\n' + \
     '/usr/hdp/current/spark2-client/bin/pyspark --master yarn --deploy-mode client' + ' --driver-cores ' + str(driver_cores) + ' --driver-memory ' + str(driver_memory) + 'G' + ' --executor-memory ' + str(executor_memory) + 'G' + ' --num-executors ' + str(num_executors) + ' --executor-cores ' + str(executor_cores) + \
-    '\n\n####################################################################\n' 
+    '\n\n####################################################################\n')
 
 
 
